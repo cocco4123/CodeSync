@@ -1,31 +1,13 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Entrar o Crear Sala</title>
+  <meta charset="UTF-8">
+  <title>Redirección - CodeSync</title>
+  <script>
+    window.location.href = 'login.html';
+  </script>
 </head>
 <body>
-  <h1>Bienvenido a CodeSync, el editor de codigo compartido en tiempo real</h1>
-
-  <form id="room-form">
-    <label>ID de sala: <input type="text" id="roomId" required /></label><br/><br/>
-    <label>Contraseña: <input type="password" id="password" required /></label><br/><br/>
-    <button type="submit">Entrar / Crear Sala</button>
-  </form>
-
-  <script>
-    const form = document.getElementById('room-form');
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const roomId = document.getElementById('roomId').value.trim();
-      const password = document.getElementById('password').value.trim();
-
-      if(roomId && password) {
-        // Redirige a editor.html pasando datos por query string
-        window.location.href = `editor.html?room=${encodeURIComponent(roomId)}&pass=${encodeURIComponent(password)}`;
-      }
-    });
-  </script>
+  <p>Si no eres redirigido automáticamente, <a href="login.html">haz clic aquí</a>.</p>
 </body>
 </html>

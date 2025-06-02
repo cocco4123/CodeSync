@@ -1,5 +1,12 @@
 const socket = io();
 
+// Verificar autenticación al cargar
+fetch('/api/user')
+  .then(response => {
+    if (!response.ok) window.location.href = 'login.html';
+  })
+  .catch(() => window.location.href = 'login.html');
+
 var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
     mode: "text/html",
     theme: "dracula",
@@ -10,6 +17,7 @@ var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
 
 const errorDiv = document.getElementById('error');
 editor.setSize(1200, 400);
+
 // Obtener roomId y password de la URL
 const params = new URLSearchParams(window.location.search);
 const roomId = params.get('room');
@@ -19,13 +27,25 @@ if (!roomId || !password) {
   errorDiv.textContent = 'Falta ID de sala o contraseña.';
   editor.setOption('readOnly', true);
 } else {
-
   socket.emit('join-room', { roomId, password });
+  
+  // Opcional: Guardar la sala si el usuario quiere
+  document.getElementById('save-room-btn')?.addEventListener('click', () => {
+    const roomName = prompt('Ingrese un nombre para esta sala (opcional):') || roomId;
+    fetch('/api/save-room', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ roomId, password, name: roomName })
+    }).then(response => {
+      if (response.ok) alert('Sala guardada en tu perfil!');
+    });
+  });
 }
+
 const nombreroom = document.getElementById('nombreroom');
 if (roomId) {
   nombreroom.textContent = `${roomId}`;
- }
+}
 
 socket.on('joined', (code) => {
   errorDiv.textContent = '';

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mis Salas - CodeSync</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Fredoka', sans-serif;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    h1 {
+      color: #444;
+    }
+    .logout-btn {
+      padding: 8px 15px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .logout-btn:hover {
+      background: #bb2d3b;
+    }
+    .room-form {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+    .rooms-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .room-card {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .room-card h3 {
+      margin-top: 0;
+    }
+    .room-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .join-btn {
+      background: #28a745;
+    }
+    .join-btn:hover {
+      background: #218838;
+    }
+    .delete-btn {
+      background: #dc3545;
+    }
+    .delete-btn:hover {
+      background: #bb2d3b;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Mis Salas Guardadas</h1>
+    <button class="logout-btn">Cerrar Sesión</button>
+  </header>
+  
+  <div class="room-form">
+    <h2>Crear/Unirse a Sala</h2>
+    <div class="form-group">
+      <label for="room-id">ID de Sala</label>
+      <input type="text" id="room-id" required>
+    </div>
+    <div class="form-group">
+      <label for="room-password">Contraseña</label>
+      <input type="password" id="room-password" required>
+    </div>
+    <div class="form-group">
+      <label for="room-name">Nombre para guardar (opcional)</label>
+      <input type="text" id="room-name">
+    </div>
+    <button id="save-room-btn">Guardar Sala</button>
+    <button id="join-room-btn">Unirse ahora</button>
+    <div id="room-error" class="error"></div>
+  </div>
+  
+  <div class="rooms-container" id="rooms-container">
+    <!-- Las salas se cargarán aquí dinámicamente -->
+  </div>
+
+  <script>
+    // Cerrar sesión
+    document.querySelector('.logout-btn').addEventListener('click', () => {
+      fetch('/api/logout', { method: 'POST' })
+        .then(() => window.location.href = 'login.html');
+    });
+
+    // Cargar salas del usuario
+    async function loadUserRooms() {
+      try {
+        const response = await fetch('/api/user');
+        if (!response.ok) {
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        const user = await response.json();
+        const container = document.getElementById('rooms-container');
+        container.innerHTML = '';
+        
+        if (user.savedRooms.length === 0) {
+          container.innerHTML = '<p>No tienes salas guardadas aún.</p>';
+          return;
+        }
+        
+        user.savedRooms.forEach(room => {
+          const card = document.createElement('div');
+          card.className = 'room-card';
+          card.innerHTML = `
+            <h3>${room.name || room.roomId}</h3>
+            <p><strong>ID:</strong> ${room.roomId}</p>
+            <div class="room-actions">
+              <button class="join-btn" data-id="${room.roomId}" data-pass="${room.password}">Unirse</button>
+              <button class="delete-btn" data-id="${room.roomId}">Eliminar</button>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+        
+        // Eventos para los botones
+        document.querySelectorAll('.join-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const roomId = btn.dataset.id;
+            const password = btn.dataset.pass;
+            window.location.href = `editor.html?room=${encodeURIComponent(roomId)}&pass=${encodeURIComponent(password)}`;
+          });
+        });
+        
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const roomId = btn.dataset.id;
+            try {
+              await fetch('/api/remove-room', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ roomId })
+              });
+              loadUserRooms();
+            } catch (error) {
+              console.error('Error al eliminar sala:', error);
+            }
+          });
+        });
+      } catch (error) {
+        console.error('Error al cargar salas:', error);
+        window.location.href = 'login.html';
+      }
+    }
+
+    // Guardar sala
+    document.getElementById('save-room-btn').addEventListener('click', async () => {
+      const roomId = document.getElementById('room-id').value.trim();
+      const password = document.getElementById('room-password').value.trim();
+      const name = document.getElementById('room-name').value.trim() || roomId;
+      
+      if (!roomId || !password) {
+        document.getElementById('room-error').textContent = 'ID y contraseña son requeridos';
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/save-room', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ roomId, password, name })
+        });
+        
+        if (response.ok) {
+          document.getElementById('room-error').textContent = '';
+          document.getElementById('room-id').value = '';
+          document.getElementById('room-password').value = '';
+          document.getElementById('room-name').value = '';
+          loadUserRooms();
+        } else {
+          const error = await response.json();
+          document.getElementById('room-error').textContent = error.error || 'Error al guardar sala';
+        }
+      } catch (error) {
+        document.getElementById('room-error').textContent = 'Error de conexión';
+      }
+    });
+
+    // Unirse directamente
+    document.getElementById('join-room-btn').addEventListener('click', () => {
+      const roomId = document.getElementById('room-id').value.trim();
+      const password = document.getElementById('room-password').value.trim();
+      
+      if (!roomId || !password) {
+        document.getElementById('room-error').textContent = 'ID y contraseña son requeridos';
+        return;
+      }
+      
+      window.location.href = `editor.html?room=${encodeURIComponent(roomId)}&pass=${encodeURIComponent(password)}`;
+    });
+
+    // Cargar salas al iniciar
+    loadUserRooms();
+  </script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Iniciar Sesión - CodeSync</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Fredoka', sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .form-container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #444;
+      text-align: center;
+    }
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+    }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      background: #eee;
+    }
+    .tab.active {
+      background: #007bff;
+      color: white;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+    #login-form, #register-form {
+      display: none;
+    }
+    #login-form.active, #register-form.active {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h1>CodeSync</h1>
+    
+    <div class="tabs">
+      <div class="tab active" data-tab="login">Iniciar Sesión</div>
+      <div class="tab" data-tab="register">Registrarse</div>
+    </div>
+    
+    <div id="login-form" class="active">
+      <div class="form-group">
+        <label for="login-username">Usuario</label>
+        <input type="text" id="login-username" required>
+      </div>
+      <div class="form-group">
+        <label for="login-password">Contraseña</label>
+        <input type="password" id="login-password" required>
+      </div>
+      <button id="login-btn">Iniciar Sesión</button>
+      <div id="login-error" class="error"></div>
+    </div>
+    
+    <div id="register-form">
+      <div class="form-group">
+        <label for="register-username">Usuario</label>
+        <input type="text" id="register-username" required>
+      </div>
+      <div class="form-group">
+        <label for="register-password">Contraseña</label>
+        <input type="password" id="register-password" required>
+      </div>
+      <div class="form-group">
+        <label for="register-confirm">Confirmar Contraseña</label>
+        <input type="password" id="register-confirm" required>
+      </div>
+      <button id="register-btn">Registrarse</button>
+      <div id="register-error" class="error"></div>
+    </div>
+  </div>
+
+  <script>
+    // Cambio entre pestañas
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('#login-form, #register-form').forEach(f => f.classList.remove('active'));
+        
+        tab.classList.add('active');
+        document.getElementById(`${tab.dataset.tab}-form`).classList.add('active');
+      });
+    });
+
+    // Login
+    document.getElementById('login-btn').addEventListener('click', async () => {
+      const username = document.getElementById('login-username').value;
+      const password = document.getElementById('login-password').value;
+      
+      try {
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          window.location.href = 'dashboard.html';
+        } else {
+          document.getElementById('login-error').textContent = data.error || 'Error al iniciar sesión';
+        }
+      } catch (error) {
+        document.getElementById('login-error').textContent = 'Error de conexión';
+      }
+    });
+
+    // Registro
+    document.getElementById('register-btn').addEventListener('click', async () => {
+      const username = document.getElementById('register-username').value;
+      const password = document.getElementById('register-password').value;
+      const confirm = document.getElementById('register-confirm').value;
+      
+      if (password !== confirm) {
+        document.getElementById('register-error').textContent = 'Las contraseñas no coinciden';
+        return;
+      }
+      
+      try {
+        const response = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          window.location.href = 'dashboard.html';
+        } else {
+          document.getElementById('register-error').textContent = data.error || 'Error al registrarse';
+        }
+      } catch (error) {
+        document.getElementById('register-error').textContent = 'Error de conexión';
+      }
+    });
+  </script>
+</body>
+</html>
