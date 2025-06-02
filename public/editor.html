@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <link rel="stylesheet" href="codemirror/codemirror-5.65.19/lib/codemirror.css">
+<link rel="stylesheet" href="codemirror/codemirror-5.65.19/theme/dracula.css">
+  <meta charset="UTF-8" />
+  <title>Editor Colaborativo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
+  <style>
+    #run{
+        font-family: "Fredoka";
+    }
+    #nombreroom{
+        font-family: "Fredoka";
+    }
+
+  </style>
+
+</head>
+<body>
+  <h1 id="nombreroom">Editor Colaborativo</h1>
+  <div id="error"></div>
+  <textarea id="editor"></textarea>
+  <button id="run">▶️ Ejecutar</button>
+  <script src="/socket.io/socket.io.js"></script>
+
+  <!-- CodeMirror -->
+  <script src="codemirror/codemirror-5.65.19/lib/codemirror.js"></script>
+
+  <!-- Modos -->
+  <script src="codemirror/codemirror-5.65.19/mode/xml/xml.js"></script>
+  <script src="codemirror/codemirror-5.65.19/mode/javascript/javascript.js"></script>
+  <script src="codemirror/codemirror-5.65.19/mode/css/css.js"></script>
+  <script src="codemirror/codemirror-5.65.19/mode/htmlmixed/htmlmixed.js"></script>
+
+  <!-- Addons -->
+  <script src="codemirror/codemirror-5.65.19/addon/edit/closetag.js"></script>
+  <script src="codemirror/codemirror-5.65.19/addon/edit/closebrackets.js"></script>
+
+  <!-- elpapu -->
+  <script src="js/client.js"></script>
+</body>
+</html>
