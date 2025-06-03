@@ -12,7 +12,8 @@ var editor = CodeMirror.fromTextArea(document.getElementById("editor"), {
     theme: "dracula",
     lineNumbers: true,
     autoCloseTags: true,
-    autoCloseBrackets: true
+    autoCloseBrackets: true,
+
 });
 
 const errorDiv = document.getElementById('error');
