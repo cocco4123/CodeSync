@@ -2,132 +2,640 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Mis Salas - CodeSync</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1E1E2E">
+  <title>CodeSync</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="favicon.svg">
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --color-background: #1E1E2E;
+      --color-panel: #2A2A3B;
+      --color-accent: #3B82F6;
+      --color-accent-secondary: #10B981;
+      --color-text: #E5E7EB;
+      --color-text-secondary: #9CA3AF;
+      --color-error: #EF4444;
+      --color-success: #10B981;
+      --color-danger: #EF4444;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Fredoka', sans-serif;
-      max-width: 1000px;
-      margin: 0 auto;
+      min-height: 100vh;
+      margin: 0;
+      background-color: var(--color-background);
+      color: var(--color-text);
       padding: 20px;
-      background-color: #f5f5f5;
     }
+
     header {
+      max-width: 1200px;
+      margin: 0 auto 30px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 30px;
+      padding: 20px;
+      background: var(--color-panel);
+      border-radius: 16px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     }
-    h1 {
-      color: #444;
+
+    h1, h2 {
+      color: var(--color-text);
+      font-weight: 600;
     }
+
     .logout-btn {
-      padding: 8px 15px;
-      background: #dc3545;
+      padding: 10px 20px;
+      background: var(--color-danger);
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
     }
+
     .logout-btn:hover {
-      background: #bb2d3b;
+      transform: translateY(-1px);
+      filter: brightness(1.1);
     }
+
     .room-form {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      margin-bottom: 30px;
+      max-width: 1200px;
+      margin: 0 auto 30px;
+      background: var(--color-panel);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     }
+
     .form-group {
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
+
     label {
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
+      color: var(--color-text);
+      font-weight: 500;
     }
+
     input {
       width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      box-sizing: border-box;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: var(--color-text);
+      font-size: 14px;
+      transition: all 0.3s ease;
     }
+
+    input:focus {
+      outline: none;
+      border-color: var(--color-accent);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
     button {
-      padding: 10px;
-      background: #007bff;
+      padding: 12px 24px;
+      background: var(--color-accent);
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
     }
+
     button:hover {
-      background: #0056b3;
+      transform: translateY(-1px);
+      filter: brightness(1.1);
     }
+
     .error {
-      color: red;
-      margin-top: 10px;
+      color: var(--color-error);
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: rgba(239, 68, 68, 0.1);
+      border-radius: 6px;
+      font-size: 14px;
+      display: none;
     }
+
+    .error:not(:empty) {
+      display: block;
+    }
+
     .rooms-container {
+      max-width: 1200px;
+      margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
       gap: 20px;
+      padding: 0;
     }
+
     .room-card {
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      background: var(--color-panel);
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
+
+    .room-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      border-color: var(--color-accent);
+    }
+
     .room-card h3 {
-      margin-top: 0;
+      margin: 0 0 16px 0;
+      color: var(--color-text);
+      font-size: 18px;
     }
+
+    .room-card p {
+      color: var(--color-text-secondary);
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
     .room-actions {
       display: flex;
-      gap: 10px;
-      margin-top: 15px;
+      gap: 12px;
     }
+
     .join-btn {
-      background: #28a745;
+      background: var(--color-success);
+      flex: 2;
     }
-    .join-btn:hover {
-      background: #218838;
-    }
+
     .delete-btn {
-      background: #dc3545;
+      background: var(--color-danger);
+      flex: 1;
     }
-    .delete-btn:hover {
-      background: #bb2d3b;
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    #save-room-btn {
+      background: var(--color-accent);
+    }
+
+    #join-room-btn {
+      background: var(--color-success);
+    }
+
+    /* Placeholder color */
+    input::placeholder {
+      color: var(--color-text-secondary);
+      opacity: 0.5;
+    }
+
+    /* Autofill styles */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus {
+      -webkit-text-fill-color: var(--color-text);
+      -webkit-box-shadow: 0 0 0px 1000px var(--color-panel) inset;
+      transition: background-color 5000s ease-in-out 0s;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--color-text-secondary);
+      background: var(--color-panel);
+      border-radius: 16px;
+      border: 2px dashed rgba(255, 255, 255, 0.1);
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading {
+      display: none;
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--color-text);
+      animation: spin 0.6s linear infinite;
+      margin: 0 auto;
+    }
+
+    .loading.active {
+      display: inline-block;
+    }
+
+    button .loading {
+      margin: 0;
+      width: 20px;
+      height: 20px;
+      border-width: 2px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    /* Tooltips */
+    [data-tooltip] {
+      position: relative;
+    }
+
+    [data-tooltip]:before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      padding: 8px 12px;
+      background: var(--color-panel);
+      color: var(--color-text);
+      font-size: 12px;
+      white-space: nowrap;
+      border-radius: 6px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+    }
+
+    [data-tooltip]:after {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      border: 6px solid transparent;
+      border-top-color: var(--color-panel);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+    }
+
+    [data-tooltip]:hover:before,
+    [data-tooltip]:hover:after {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Logo */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo svg {
+      width: 32px;
+      height: 32px;
+    }
+
+    .logo .primary {
+      fill: var(--color-accent);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .logo .primary {
+        fill: #60A5FA;
+      }
+    }
+
+    .logo h1 {
+      font-size: 24px;
+      background: linear-gradient(135deg, var(--color-accent), var(--color-accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0;
+    }
+
+    /* Room filters */
+    .room-filters {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .filter-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--color-text-secondary);
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+
+    .filter-btn.active {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      color: white;
+    }
+
+    /* Room sorting */
+    .sort-dropdown {
+      position: relative;
+      margin-left: auto;
+    }
+
+    .sort-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--color-text-secondary);
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+
+    .sort-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .sort-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      margin-top: 8px;
+      background: var(--color-panel);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      min-width: 180px;
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.2s ease;
+    }
+
+    .sort-menu.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .sort-option {
+      padding: 8px 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sort-option:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .sort-option.active {
+      color: var(--color-accent);
+    }
+
+    .sort-option svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    /* Version info */
+    .version-info {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      color: var(--color-text-secondary);
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    /* Keyboard shortcuts */
+    .keyboard-shortcuts {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--color-panel);
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--color-text-secondary);
+      font-size: 14px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+    }
+
+    .keyboard-shortcuts.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .keyboard-shortcuts h4 {
+      color: var(--color-text);
+      margin: 0 0 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .keyboard-shortcuts svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .shortcut {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .shortcut:last-child {
+      margin-bottom: 0;
+    }
+
+    .key {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    /* Search bar */
+    .search-bar {
+      position: relative;
+      margin-bottom: 20px;
+      max-width: 1200px;
+      margin: 0 auto 30px;
+    }
+
+    .search-bar input {
+      width: 100%;
+      padding: 12px 16px 12px 48px;
+      background: var(--color-panel);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      color: var(--color-text);
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .search-bar input:focus {
+      outline: none;
+      border-color: var(--color-accent);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .search-bar svg {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      fill: var(--color-text-secondary);
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    .search-bar input:focus + svg {
+      fill: var(--color-accent);
+      opacity: 1;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Mis Salas Guardadas</h1>
-    <button class="logout-btn">Cerrar Sesión</button>
+    <div class="logo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path class="primary" d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+      </svg>
+      <h1>CodeSync</h1>
+    </div>
+    <button class="logout-btn" onclick="logout()">Cerrar sesión</button>
   </header>
   
   <div class="room-form">
     <h2>Crear/Unirse a Sala</h2>
     <div class="form-group">
       <label for="room-id">ID de Sala</label>
-      <input type="text" id="room-id" required>
+      <input type="text" id="room-id" placeholder="Ingresa el ID de la sala" required>
     </div>
     <div class="form-group">
       <label for="room-password">Contraseña</label>
-      <input type="password" id="room-password" required>
+      <input type="password" id="room-password" placeholder="Ingresa la contraseña de la sala" required>
     </div>
     <div class="form-group">
       <label for="room-name">Nombre para guardar (opcional)</label>
-      <input type="text" id="room-name">
+      <input type="text" id="room-name" placeholder="Dale un nombre personalizado a la sala">
     </div>
-    <button id="save-room-btn">Guardar Sala</button>
-    <button id="join-room-btn">Unirse ahora</button>
+    <div class="form-actions">
+      <button id="save-room-btn">Guardar Sala</button>
+      <button id="join-room-btn">Unirse ahora</button>
+    </div>
     <div id="room-error" class="error"></div>
+  </div>
+  
+  <div class="search-bar">
+    <svg viewBox="0 0 24 24">
+      <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+    </svg>
+    <input type="text" id="room-search" placeholder="Buscar salas...">
+  </div>
+
+  <div class="room-filters">
+    <button class="filter-btn active" data-filter="all">Todas</button>
+    <button class="filter-btn" data-filter="recent">Recientes</button>
+    <button class="filter-btn" data-filter="favorites">Favoritas</button>
+    <div class="sort-dropdown">
+      <button class="sort-btn" id="sort-btn">
+        <svg viewBox="0 0 24 24">
+          <path d="M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z"/>
+        </svg>
+        Ordenar por
+      </button>
+      <div class="sort-menu" id="sort-menu">
+        <div class="sort-option active" data-sort="name">
+          <svg viewBox="0 0 24 24">
+            <path d="M14.94 4.66h-4.72l2.36-2.36zm-4.69 14.71h4.66l-2.33 2.33zM6.1 6.27L1.6 17.73h1.84l.92-2.45h5.11l.92 2.45h1.84L7.74 6.27H6.1zm-1.13 7.37l1.94-5.18 1.94 5.18H4.97zm10.76 2.5h6.12v1.59h-8.53v-1.29l5.92-8.56h-5.88v-1.6h8.3v1.26l-5.93 8.6z"/>
+          </svg>
+          Nombre
+        </div>
+        <div class="sort-option" data-sort="date">
+          <svg viewBox="0 0 24 24">
+            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+          </svg>
+          Fecha
+        </div>
+      </div>
+    </div>
   </div>
   
   <div class="rooms-container" id="rooms-container">
     <!-- Las salas se cargarán aquí dinámicamente -->
+  </div>
+
+  <div class="keyboard-shortcuts">
+    <h4>
+      <svg viewBox="0 0 24 24">
+        <path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/>
+      </svg>
+      Atajos de Teclado
+    </h4>
+    <div class="shortcut">
+      <span class="key">/</span>
+      <span>Buscar</span>
+    </div>
+    <div class="shortcut">
+      <span class="key">Alt + N</span>
+      <span>Nueva sala</span>
+    </div>
+    <div class="shortcut">
+      <span class="key">Alt + F</span>
+      <span>Filtrar</span>
+    </div>
+  </div>
+
+  <div class="version-info">
+    CodeSync v1.0.0
   </div>
 
   <script>
@@ -141,17 +649,19 @@
     async function loadUserRooms() {
       try {
         const response = await fetch('/api/user');
-        if (!response.ok) {
-          window.location.href = 'login.html';
-          return;
-        }
+        if (!response.ok) throw new Error('No autenticado');
         
         const user = await response.json();
         const container = document.getElementById('rooms-container');
         container.innerHTML = '';
         
-        if (user.savedRooms.length === 0) {
-          container.innerHTML = '<p>No tienes salas guardadas aún.</p>';
+        if (!user.savedRooms || user.savedRooms.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <p>No tienes salas guardadas</p>
+              <small>Crea o únete a una sala para empezar</small>
+            </div>
+          `;
           return;
         }
         
@@ -160,36 +670,42 @@
           card.className = 'room-card';
           card.innerHTML = `
             <h3>${room.name || room.roomId}</h3>
-            <p><strong>ID:</strong> ${room.roomId}</p>
+            <p class="room-stats">ID: ${room.roomId}</p>
             <div class="room-actions">
-              <button class="join-btn" data-id="${room.roomId}" data-pass="${room.password}">Unirse</button>
-              <button class="delete-btn" data-id="${room.roomId}">Eliminar</button>
+              <button class="join-btn" onclick="window.location.href='editor.html?room=${encodeURIComponent(room.roomId)}&pass=${encodeURIComponent(room.password)}'">
+                Unirse
+              </button>
+              <button class="delete-btn">
+                <div class="loading"></div>
+                Eliminar
+              </button>
             </div>
           `;
+          
           container.appendChild(card);
-        });
-        
-        // Eventos para los botones
-        document.querySelectorAll('.join-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const roomId = btn.dataset.id;
-            const password = btn.dataset.pass;
-            window.location.href = `editor.html?room=${encodeURIComponent(roomId)}&pass=${encodeURIComponent(password)}`;
-          });
-        });
-        
-        document.querySelectorAll('.delete-btn').forEach(btn => {
-          btn.addEventListener('click', async () => {
-            const roomId = btn.dataset.id;
+          
+          // Delete room handler
+          const deleteBtn = card.querySelector('.delete-btn');
+          const loading = deleteBtn.querySelector('.loading');
+          
+          deleteBtn.addEventListener('click', async () => {
+            if (!confirm('¿Estás seguro de que quieres eliminar esta sala?')) return;
+            
+            const btn = deleteBtn;
+            btn.disabled = true;
+            loading.classList.add('active');
+            
             try {
-              await fetch('/api/remove-room', {
+              await fetch('/api/delete-room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ roomId })
+                body: JSON.stringify({ roomId: room.roomId })
               });
               loadUserRooms();
             } catch (error) {
               console.error('Error al eliminar sala:', error);
+              btn.disabled = false;
+              loading.classList.remove('active');
             }
           });
         });
@@ -201,12 +717,26 @@
 
     // Guardar sala
     document.getElementById('save-room-btn').addEventListener('click', async () => {
+      const button = document.getElementById('save-room-btn');
+      const loading = button.querySelector('.loading') || document.createElement('div');
+      loading.className = 'loading';
+      if (!button.querySelector('.loading')) {
+        button.appendChild(loading);
+      }
+      
+      button.disabled = true;
+      loading.classList.add('active');
+
       const roomId = document.getElementById('room-id').value.trim();
       const password = document.getElementById('room-password').value.trim();
       const name = document.getElementById('room-name').value.trim() || roomId;
       
       if (!roomId || !password) {
-        document.getElementById('room-error').textContent = 'ID y contraseña son requeridos';
+        const error = document.getElementById('room-error');
+        error.textContent = 'ID y contraseña son requeridos';
+        error.style.display = 'block';
+        button.disabled = false;
+        loading.classList.remove('active');
         return;
       }
       
@@ -218,17 +748,24 @@
         });
         
         if (response.ok) {
-          document.getElementById('room-error').textContent = '';
+          document.getElementById('room-error').style.display = 'none';
           document.getElementById('room-id').value = '';
           document.getElementById('room-password').value = '';
           document.getElementById('room-name').value = '';
           loadUserRooms();
         } else {
           const error = await response.json();
-          document.getElementById('room-error').textContent = error.error || 'Error al guardar sala';
+          const errorEl = document.getElementById('room-error');
+          errorEl.textContent = error.error || 'Error al guardar sala';
+          errorEl.style.display = 'block';
         }
       } catch (error) {
-        document.getElementById('room-error').textContent = 'Error de conexión';
+        const errorEl = document.getElementById('room-error');
+        errorEl.textContent = 'Error de conexión';
+        errorEl.style.display = 'block';
+      } finally {
+        button.disabled = false;
+        loading.classList.remove('active');
       }
     });
 
@@ -238,7 +775,9 @@
       const password = document.getElementById('room-password').value.trim();
       
       if (!roomId || !password) {
-        document.getElementById('room-error').textContent = 'ID y contraseña son requeridos';
+        const error = document.getElementById('room-error');
+        error.textContent = 'ID y contraseña son requeridos';
+        error.style.display = 'block';
         return;
       }
       
@@ -247,6 +786,95 @@
 
     // Cargar salas al iniciar
     loadUserRooms();
+
+    // Search functionality
+    const searchInput = document.getElementById('room-search');
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      const rooms = document.querySelectorAll('.room-card');
+      
+      rooms.forEach(room => {
+        const name = room.querySelector('h3').textContent.toLowerCase();
+        const id = room.querySelector('.room-stats').textContent.toLowerCase();
+        
+        if (name.includes(query) || id.includes(query)) {
+          room.style.display = '';
+        } else {
+          room.style.display = 'none';
+        }
+      });
+    });
+
+    // Filter functionality
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        const filter = btn.dataset.filter;
+        const rooms = document.querySelectorAll('.room-card');
+        
+        rooms.forEach(room => {
+          if (filter === 'all') {
+            room.style.display = '';
+          } else if (filter === 'recent') {
+            room.style.display = '';
+          } else if (filter === 'favorites') {
+            room.style.display = '';
+          }
+        });
+      });
+    });
+
+    // Sort functionality
+    const sortBtn = document.getElementById('sort-btn');
+    const sortMenu = document.getElementById('sort-menu');
+    
+    sortBtn.addEventListener('click', () => {
+      sortMenu.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!sortBtn.contains(e.target) && !sortMenu.contains(e.target)) {
+        sortMenu.classList.remove('active');
+      }
+    });
+
+    document.querySelectorAll('.sort-option').forEach(option => {
+      option.addEventListener('click', () => {
+        document.querySelectorAll('.sort-option').forEach(o => o.classList.remove('active'));
+        option.classList.add('active');
+        sortMenu.classList.remove('active');
+        
+        const sort = option.dataset.sort;
+        const container = document.getElementById('rooms-container');
+        const rooms = Array.from(container.children);
+        
+        rooms.sort((a, b) => {
+          if (sort === 'name') {
+            return a.querySelector('h3').textContent.localeCompare(b.querySelector('h3').textContent);
+          }
+        });
+        
+        container.innerHTML = '';
+        rooms.forEach(room => container.appendChild(room));
+      });
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && !e.target.matches('input')) {
+        e.preventDefault();
+        searchInput.focus();
+      } else if (e.altKey && e.key === 'n') {
+        document.getElementById('room-id').focus();
+      }
+    });
+
+    // Show keyboard shortcuts after a delay
+    setTimeout(() => {
+      document.querySelector('.keyboard-shortcuts').classList.add('visible');
+    }, 1000);
   </script>
 </body>
 </html>

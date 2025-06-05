@@ -95,16 +95,27 @@ io.on('connection', (socket) => {
       if (rooms[roomId].password === password) {
         socket.join(roomId);
         socket.emit('joined', rooms[roomId].code);
+        // Inicializar mensajes si no existen
+        if (!rooms[roomId].messages) {
+          rooms[roomId].messages = [];
+        }
+        console.log(`Enviando historial de mensajes a nuevo usuario en sala ${roomId}:`, rooms[roomId].messages);
+        // Enviar historial de mensajes al nuevo usuario
+        socket.emit('chat-history', rooms[roomId].messages);
         console.log(`Usuario entró a sala ${roomId}`);
       } else {
         socket.emit('error-message', 'Contraseña incorrecta');
       }
     } else {
       // Crear sala nueva
-      rooms[roomId] = { password, code: '' };
+      rooms[roomId] = { 
+        password, 
+        code: '',
+        messages: [] // Inicializar array de mensajes
+      };
       socket.join(roomId);
       socket.emit('joined', '');
-      console.log(`Sala ${roomId} creada`);
+      console.log(`Sala ${roomId} creada con mensajes vacíos`);
     }
   });
 
@@ -112,6 +123,27 @@ io.on('connection', (socket) => {
     if (rooms[roomId]) {
       rooms[roomId].code = code;
       socket.to(roomId).emit('code-update', code);
+    }
+  });
+
+  // Nuevo evento para mensajes de chat
+  socket.on('chat-message', ({ roomId, username, message }) => {
+    console.log(`Mensaje recibido en sala ${roomId}:`, { username, message });
+    if (rooms[roomId]) {
+      const messageData = {
+        username,
+        message,
+        timestamp: new Date().toISOString()
+      };
+      // Guardar mensaje en el historial
+      rooms[roomId].messages.push(messageData);
+      // Limitar el historial a los últimos 100 mensajes
+      if (rooms[roomId].messages.length > 100) {
+        rooms[roomId].messages.shift();
+      }
+      console.log(`Emitiendo mensaje a sala ${roomId}:`, messageData);
+      // Emitir mensaje a todos en la sala, incluyendo el remitente
+      io.to(roomId).emit('chat-update', messageData);
     }
   });
 

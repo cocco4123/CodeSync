@@ -1,46 +1,342 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeSync - Editor Colaborativo</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="apple-touch-icon" href="/favicon.svg">
+    <meta name="theme-color" content="#1E1E2E">
     <link rel="stylesheet" href="codemirror/codemirror-5.65.19/lib/codemirror.css">
-<link rel="stylesheet" href="codemirror/codemirror-5.65.19/theme/dracula.css">
-  <meta charset="UTF-8" />
-  <title>Editor Colaborativo</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
-  <style>
-    #run{
-        font-family: "Fredoka";
-    }
-    #nombreroom{
-        font-family: "Fredoka";
-    }
+    <link rel="stylesheet" href="codemirror/codemirror-5.65.19/theme/dracula.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-background: #1E1E2E;
+            --color-panel: #2A2A3B;
+            --color-accent: #3B82F6;
+            --color-accent-secondary: #10B981;
+            --color-text: #E5E7EB;
+            --color-text-secondary: #9CA3AF;
+            --color-error: #EF4444;
+        }
 
-  </style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            font-family: "Fredoka", sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-text);
+        }
+
+        .main-container {
+            display: flex;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+            background-color: var(--color-panel);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .editor-wrapper {
+            flex: 1;
+            min-height: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #editor {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            resize: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background: var(--color-panel);
+            color: var(--color-text);
+            padding: 12px;
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .chat-container {
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            background: var(--color-panel);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        #chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            background: var(--color-panel);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .message {
+            margin-bottom: 12px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .message:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Estilo especial para mensajes enviados por el usuario actual */
+        .message.own-message {
+            background: rgba(59, 130, 246, 0.15);
+            border-right: 3px solid var(--color-accent);
+        }
+
+        .message.own-message:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        .message .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .message .username {
+            font-weight: 600;
+            color: var(--color-accent);
+        }
+
+        .message.own-message .username {
+            color: var(--color-accent-secondary);
+        }
+
+        .message .time {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        .message .content {
+            color: var(--color-text);
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        .chat-input-container {
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            gap: 8px;
+        }
+
+        #chat-input {
+            flex: 1;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--color-text);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        #chat-input:focus {
+            border-color: var(--color-accent);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        #send-message {
+            padding: 10px 20px;
+            background: var(--color-accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #send-message:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        #run {
+            padding: 10px 20px;
+            background: var(--color-accent-secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        #run:hover {
+            background: #0d9488;
+            transform: translateY(-1px);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .logo .primary {
+            fill: var(--color-accent);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .logo .primary {
+                fill: #60A5FA;
+            }
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            background: linear-gradient(135deg, var(--color-accent), var(--color-accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        #nombreroom {
+            margin: 0;
+            color: var(--color-text);
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .CodeMirror {
+            height: 100% !important;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--color-panel) !important;
+        }
+
+        #error {
+            color: var(--color-error);
+            margin-bottom: 16px;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            display: none;
+        }
+
+        #error:not(:empty) {
+            display: block;
+        }
+
+        /* Scrollbar personalizado */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+    </style>
 </head>
 <body>
-  <h1 id="nombreroom">Editor Colaborativo</h1>
-  <div id="error"></div>
-  <textarea id="editor"></textarea>
-  <button id="run">▶️ Ejecutar</button>
-  <script src="/socket.io/socket.io.js"></script>
+    <div class="header">
+        <div class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <path class="primary" d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+            </svg>
+            <h1>CodeSync</h1>
+        </div>
+        <span style="color: var(--color-text-secondary); margin: 0 8px;">•</span>
+        <h1 id="nombreroom">Cargando sala...</h1>
+    </div>
+    <div id="error"></div>
+    
+    <div class="main-container">
+        <div class="editor-container">
+            <div class="editor-wrapper">
+                <textarea id="editor"></textarea>
+            </div>
+            <button id="run">▶️ Ejecutar</button>
+        </div>
+        
+        <div class="chat-container">
+            <div id="chat-messages"></div>
+            <div class="chat-input-container">
+                <input type="text" id="chat-input" placeholder="Escribe un mensaje...">
+                <button id="send-message">Enviar</button>
+            </div>
+        </div>
+    </div>
 
-  <!-- CodeMirror -->
-  <script src="codemirror/codemirror-5.65.19/lib/codemirror.js"></script>
-
-  <!-- Modos -->
-  <script src="codemirror/codemirror-5.65.19/mode/xml/xml.js"></script>
-  <script src="codemirror/codemirror-5.65.19/mode/javascript/javascript.js"></script>
-  <script src="codemirror/codemirror-5.65.19/mode/css/css.js"></script>
-  <script src="codemirror/codemirror-5.65.19/mode/htmlmixed/htmlmixed.js"></script>
-
-  <!-- Addons -->
-  <script src="codemirror/codemirror-5.65.19/addon/edit/closetag.js"></script>
-  <script src="codemirror/codemirror-5.65.19/addon/edit/closebrackets.js"></script>
-  <script src="codemirror/codemirror-5.65.19/addon/edit/"></script>
-
-  <!-- elpapu -->
-  <script src="js/client.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="codemirror/codemirror-5.65.19/lib/codemirror.js"></script>
+    <script src="codemirror/codemirror-5.65.19/mode/xml/xml.js"></script>
+    <script src="codemirror/codemirror-5.65.19/mode/javascript/javascript.js"></script>
+    <script src="codemirror/codemirror-5.65.19/mode/css/css.js"></script>
+    <script src="codemirror/codemirror-5.65.19/mode/htmlmixed/htmlmixed.js"></script>
+    <script src="codemirror/codemirror-5.65.19/addon/edit/closetag.js"></script>
+    <script src="codemirror/codemirror-5.65.19/addon/edit/closebrackets.js"></script>
+    <script src="js/client.js"></script>
 </body>
 </html>

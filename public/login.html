@@ -2,83 +2,377 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Iniciar Sesión - CodeSync</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1E1E2E">
+  <title>CodeSync</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="favicon.svg">
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --color-background: #1E1E2E;
+      --color-panel: #2A2A3B;
+      --color-accent: #3B82F6;
+      --color-accent-secondary: #10B981;
+      --color-text: #E5E7EB;
+      --color-text-secondary: #9CA3AF;
+      --color-error: #EF4444;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Fredoka', sans-serif;
-      max-width: 600px;
-      margin: 0 auto;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--color-background);
+      color: var(--color-text);
       padding: 20px;
-      background-color: #f5f5f5;
     }
+
     .form-container {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      background: var(--color-panel);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
     }
-    h1 {
-      color: #444;
+
+    .logo {
       text-align: center;
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
     }
+
+    .logo svg {
+      width: 40px;
+      height: 40px;
+    }
+
+    .logo .primary {
+      fill: var(--color-accent);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .logo .primary {
+        fill: #60A5FA;
+      }
+    }
+
+    .logo h1 {
+      font-size: 36px;
+      background: linear-gradient(135deg, var(--color-accent), var(--color-accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0;
+    }
+
     .tabs {
       display: flex;
-      margin-bottom: 20px;
+      margin-bottom: 30px;
+      background: rgba(255, 255, 255, 0.05);
+      padding: 4px;
+      border-radius: 12px;
     }
+
     .tab {
       flex: 1;
       text-align: center;
-      padding: 10px;
+      padding: 12px;
       cursor: pointer;
-      background: #eee;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      color: var(--color-text-secondary);
     }
+
+    .tab:hover:not(.active) {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
     .tab.active {
-      background: #007bff;
+      background: var(--color-accent);
       color: white;
     }
+
     .form-group {
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
+
     label {
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
+      color: var(--color-text);
+      font-weight: 500;
     }
+
     input {
       width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      box-sizing: border-box;
+      padding: 12px 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: var(--color-text);
+      font-size: 14px;
+      transition: all 0.3s ease;
     }
+
+    input:focus {
+      outline: none;
+      border-color: var(--color-accent);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
     button {
       width: 100%;
-      padding: 10px;
-      background: #007bff;
+      padding: 12px;
+      background: var(--color-accent);
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 16px;
+      font-weight: 500;
+      transition: all 0.3s ease;
     }
+
     button:hover {
-      background: #0056b3;
+      background: #2563eb;
+      transform: translateY(-1px);
     }
+
     .error {
-      color: red;
-      margin-top: 10px;
-    }
-    #login-form, #register-form {
+      color: var(--color-error);
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: rgba(239, 68, 68, 0.1);
+      border-radius: 6px;
+      font-size: 14px;
       display: none;
     }
+
+    .error:not(:empty) {
+      display: block;
+    }
+
+    #login-form, #register-form {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
     #login-form.active, #register-form.active {
       display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading {
+      display: none;
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top-color: var(--color-text);
+      animation: spin 0.6s linear infinite;
+      margin: 0 auto;
+    }
+
+    .loading.active {
+      display: inline-block;
+    }
+
+    button .loading {
+      margin: 0;
+      width: 20px;
+      height: 20px;
+      border-width: 2px;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    /* Placeholder color */
+    input::placeholder {
+      color: var(--color-text-secondary);
+      opacity: 0.5;
+    }
+
+    /* Autofill styles */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus {
+      -webkit-text-fill-color: var(--color-text);
+      -webkit-box-shadow: 0 0 0px 1000px var(--color-panel) inset;
+      transition: background-color 5000s ease-in-out 0s;
+    }
+
+    /* Keyboard shortcuts */
+    .keyboard-shortcuts {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--color-panel);
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--color-text-secondary);
+      font-size: 14px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+    }
+
+    .keyboard-shortcuts.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .keyboard-shortcuts h4 {
+      color: var(--color-text);
+      margin: 0 0 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .keyboard-shortcuts svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    .shortcut {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .shortcut:last-child {
+      margin-bottom: 0;
+    }
+
+    .key {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    /* Password strength meter */
+    .password-strength {
+      margin-top: 8px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .password-strength-bar {
+      height: 100%;
+      width: 0;
+      transition: all 0.3s ease;
+    }
+
+    .password-strength-bar.weak { 
+      width: 33%; 
+      background: var(--color-error);
+    }
+    .password-strength-bar.medium { 
+      width: 66%; 
+      background: #F59E0B;
+    }
+    .password-strength-bar.strong { 
+      width: 100%; 
+      background: var(--color-success);
+    }
+
+    .password-requirements {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    .requirement {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 4px;
+    }
+
+    .requirement svg {
+      width: 12px;
+      height: 12px;
+      fill: currentColor;
+    }
+
+    .requirement.met {
+      color: var(--color-success);
+    }
+
+    /* Remember me checkbox */
+    .form-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 16px 0;
+      cursor: pointer;
+    }
+
+    .form-check input {
+      width: auto;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    /* Version info */
+    .version-info {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      color: var(--color-text-secondary);
+      font-size: 12px;
+      opacity: 0.7;
     }
   </style>
 </head>
 <body>
   <div class="form-container">
-    <h1>CodeSync</h1>
+    <div class="logo">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path class="primary" d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
+      </svg>
+      <h1>CodeSync</h1>
+    </div>
     
     <div class="tabs">
       <div class="tab active" data-tab="login">Iniciar Sesión</div>
@@ -88,12 +382,16 @@
     <div id="login-form" class="active">
       <div class="form-group">
         <label for="login-username">Usuario</label>
-        <input type="text" id="login-username" required>
+        <input type="text" id="login-username" placeholder="Ingresa tu usuario" required>
       </div>
       <div class="form-group">
         <label for="login-password">Contraseña</label>
-        <input type="password" id="login-password" required>
+        <input type="password" id="login-password" placeholder="Ingresa tu contraseña" required>
       </div>
+      <label class="form-check">
+        <input type="checkbox" id="remember-me">
+        Recordar sesión
+      </label>
       <button id="login-btn">Iniciar Sesión</button>
       <div id="login-error" class="error"></div>
     </div>
@@ -101,35 +399,102 @@
     <div id="register-form">
       <div class="form-group">
         <label for="register-username">Usuario</label>
-        <input type="text" id="register-username" required>
+        <input type="text" id="register-username" placeholder="Elige un nombre de usuario" required>
       </div>
       <div class="form-group">
         <label for="register-password">Contraseña</label>
-        <input type="password" id="register-password" required>
+        <input type="password" id="register-password" placeholder="Elige una contraseña" required>
+        <div class="password-strength">
+          <div class="password-strength-bar"></div>
+        </div>
+        <div class="password-requirements">
+          <div class="requirement" data-req="length">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+            Mínimo 8 caracteres
+          </div>
+          <div class="requirement" data-req="number">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+            Al menos un número
+          </div>
+          <div class="requirement" data-req="special">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+            Al menos un carácter especial
+          </div>
+        </div>
       </div>
       <div class="form-group">
         <label for="register-confirm">Confirmar Contraseña</label>
-        <input type="password" id="register-confirm" required>
+        <input type="password" id="register-confirm" placeholder="Confirma tu contraseña" required>
       </div>
       <button id="register-btn">Registrarse</button>
       <div id="register-error" class="error"></div>
     </div>
   </div>
 
+  <div class="keyboard-shortcuts">
+    <h4>
+      <svg viewBox="0 0 24 24">
+        <path d="M20 5H4c-1.1 0-1.99.9-1.99 2L2 17c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-9 3h2v2h-2V8zm0 3h2v2h-2v-2zM8 8h2v2H8V8zm0 3h2v2H8v-2zm-1 2H5v-2h2v2zm0-3H5V8h2v2zm9 7H8v-2h8v2zm0-4h-2v-2h2v2zm0-3h-2V8h2v2zm3 3h-2v-2h2v2zm0-3h-2V8h2v2z"/>
+      </svg>
+      Atajos de Teclado
+    </h4>
+    <div class="shortcut">
+      <span class="key">Tab</span>
+      <span>Navegar campos</span>
+    </div>
+    <div class="shortcut">
+      <span class="key">Enter</span>
+      <span>Enviar formulario</span>
+    </div>
+    <div class="shortcut">
+      <span class="key">Alt + L</span>
+      <span>Iniciar sesión</span>
+    </div>
+    <div class="shortcut">
+      <span class="key">Alt + R</span>
+      <span>Registrarse</span>
+    </div>
+  </div>
+
+  <div class="version-info">
+    CodeSync v1.0.0
+  </div>
+
   <script>
-    // Cambio entre pestañas
+    // Cambio entre pestañas con animación
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', () => {
+        // Remover clases activas
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('#login-form, #register-form').forEach(f => f.classList.remove('active'));
+        document.querySelectorAll('#login-form, #register-form').forEach(f => {
+          f.style.opacity = '0';
+          f.style.transform = 'translateY(10px)';
+          setTimeout(() => f.classList.remove('active'), 300);
+        });
         
+        // Agregar clases activas con animación
         tab.classList.add('active');
-        document.getElementById(`${tab.dataset.tab}-form`).classList.add('active');
+        const form = document.getElementById(`${tab.dataset.tab}-form`);
+        setTimeout(() => {
+          form.classList.add('active');
+          form.style.opacity = '1';
+          form.style.transform = 'translateY(0)';
+        }, 300);
       });
     });
 
     // Login
     document.getElementById('login-btn').addEventListener('click', async () => {
+      const button = document.getElementById('login-btn');
+      const loading = button.querySelector('.loading') || document.createElement('div');
+      loading.className = 'loading';
+      if (!button.querySelector('.loading')) {
+        button.appendChild(loading);
+      }
+      
+      button.disabled = true;
+      loading.classList.add('active');
+      
       const username = document.getElementById('login-username').value;
       const password = document.getElementById('login-password').value;
       
@@ -144,21 +509,42 @@
         if (data.success) {
           window.location.href = 'dashboard.html';
         } else {
-          document.getElementById('login-error').textContent = data.error || 'Error al iniciar sesión';
+          const error = document.getElementById('login-error');
+          error.textContent = data.error || 'Error al iniciar sesión';
+          error.style.display = 'block';
         }
       } catch (error) {
-        document.getElementById('login-error').textContent = 'Error de conexión';
+        const errorEl = document.getElementById('login-error');
+        errorEl.textContent = 'Error de conexión';
+        errorEl.style.display = 'block';
+      } finally {
+        button.disabled = false;
+        loading.classList.remove('active');
       }
     });
 
     // Registro
     document.getElementById('register-btn').addEventListener('click', async () => {
+      const button = document.getElementById('register-btn');
+      const loading = button.querySelector('.loading') || document.createElement('div');
+      loading.className = 'loading';
+      if (!button.querySelector('.loading')) {
+        button.appendChild(loading);
+      }
+      
+      button.disabled = true;
+      loading.classList.add('active');
+      
       const username = document.getElementById('register-username').value;
       const password = document.getElementById('register-password').value;
       const confirm = document.getElementById('register-confirm').value;
       
       if (password !== confirm) {
-        document.getElementById('register-error').textContent = 'Las contraseñas no coinciden';
+        const error = document.getElementById('register-error');
+        error.textContent = 'Las contraseñas no coinciden';
+        error.style.display = 'block';
+        button.disabled = false;
+        loading.classList.remove('active');
         return;
       }
       
@@ -173,10 +559,90 @@
         if (data.success) {
           window.location.href = 'dashboard.html';
         } else {
-          document.getElementById('register-error').textContent = data.error || 'Error al registrarse';
+          const error = document.getElementById('register-error');
+          error.textContent = data.error || 'Error al registrarse';
+          error.style.display = 'block';
         }
       } catch (error) {
-        document.getElementById('register-error').textContent = 'Error de conexión';
+        const errorEl = document.getElementById('register-error');
+        errorEl.textContent = 'Error de conexión';
+        errorEl.style.display = 'block';
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    // Enter key support
+    document.querySelectorAll('input').forEach(input => {
+      input.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          const form = input.closest('#login-form, #register-form');
+          if (form.id === 'login-form') {
+            document.getElementById('login-btn').click();
+          } else {
+            document.getElementById('register-btn').click();
+          }
+        }
+      });
+    });
+
+    // Password strength checker
+    document.getElementById('register-password').addEventListener('input', function(e) {
+      const password = e.target.value;
+      const strengthBar = document.querySelector('.password-strength-bar');
+      const requirements = {
+        length: password.length >= 8,
+        number: /\d/.test(password),
+        special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+      };
+
+      // Update requirements UI
+      Object.entries(requirements).forEach(([req, met]) => {
+        const el = document.querySelector(`.requirement[data-req="${req}"]`);
+        if (met) {
+          el.classList.add('met');
+          el.querySelector('svg').innerHTML = '<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>';
+        } else {
+          el.classList.remove('met');
+          el.querySelector('svg').innerHTML = '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>';
+        }
+      });
+
+      // Calculate strength
+      const metCount = Object.values(requirements).filter(Boolean).length;
+      strengthBar.className = 'password-strength-bar';
+      if (metCount === 3) strengthBar.classList.add('strong');
+      else if (metCount === 2) strengthBar.classList.add('medium');
+      else if (metCount === 1) strengthBar.classList.add('weak');
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      if (e.altKey && e.key === 'l') {
+        document.querySelector('[data-tab="login"]').click();
+      } else if (e.altKey && e.key === 'r') {
+        document.querySelector('[data-tab="register"]').click();
+      }
+    });
+
+    // Show keyboard shortcuts after a delay
+    setTimeout(() => {
+      document.querySelector('.keyboard-shortcuts').classList.add('visible');
+    }, 1000);
+
+    // Remember me functionality
+    const rememberMe = document.getElementById('remember-me');
+    if (localStorage.getItem('remember_username')) {
+      document.getElementById('login-username').value = localStorage.getItem('remember_username');
+      rememberMe.checked = true;
+    }
+
+    document.getElementById('login-btn').addEventListener('click', async () => {
+      // ... existing login code ...
+      if (rememberMe.checked) {
+        localStorage.setItem('remember_username', username);
+      } else {
+        localStorage.removeItem('remember_username');
       }
     });
   </script>
